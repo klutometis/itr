@@ -1,3 +1,74 @@
 * TODO Airline example
+  Need a composite key: user and project; need a mapping from projects
+  to roots to start the users.
+
+  #+BEGIN_SRC scheme :tangle itr.scm :comments link :shebang #!/usr/bin/env chicken-scheme
+    (use alist-lib
+         call-with-query
+         debug
+         define-record-and-printer
+         matchable
+         medea)
+    
+    ;;; Some notion of expiry.
+    (define-record-and-printer user
+      id
+      progress)
+    
+    (define users (make-hash-table))
+    
+    (define-record-and-printer airline-user
+      record)
+    
+    (define airline-users (make-hash-table))
+    
+    ;;; Need labels, probably, for loops.
+    (define (airline user dictum)
+      (let ((airline-user
+             (hash-table-update!
+              airline-users
+              (user-id user)
+              identity
+              (lambda () (make-airline-user #f)))))
+        (match dictum
+          ("change"
+           (if (airline-user-record airline-user)
+               (begin
+                 (user-progress-set! user (lambda (user dictum)))
+                 "What would you like to change your flight to?")
+               (begin
+                 (user-progress-set! user (lambda (user dictum)))
+                 "What is your record locator?"))))))
+    
+    (define project
+      `((1 . ,airline)))
+    
+    (call-with-dynamic-fastcgi-query
+     (lambda (query)
+       (let ((user (query-client-any query 'user))
+             (project (query-client-any query 'project))
+             (dictum (query-client-any query 'dictum)))
+         (let ((user (hash-table-update!
+                       users
+                       (cons user project)
+                       identity
+                       (lambda ()
+                         (make-user user (alist-ref projects project))))))
+           ((user-progress user) dictum)))))
+  #+END_SRC
+
+  #+BEGIN_SRC scheme
+    (use debug
+         matchable
+         srfi-13)
+    
+    (define (token-match? token)
+      (lambda (dictum)
+        (member token (map string-downcase (string-tokenize token)))))
+    
+    (match "fuck this shit"
+      ((? (token-match? "fuck")) 'god-damn))
+  #+END_SRC
+
 * TODO Use continuations to save place across requests
 * TODO Key on incoming phone number and project-id
