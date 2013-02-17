@@ -64,7 +64,7 @@
       ((? (token-match? "change"))
        (user-progress-set! user airline-get-record)
        "What is your record locator?")
-      (_ "Sorry; I can help you change your flight. How can I help you?"))))
+      (_ "Sorry; can I help you change your flight?"))))
 
 (define projects
   (alist->hash-table `(("1" . ,airline))))
