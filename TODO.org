@@ -60,14 +60,16 @@
   #+BEGIN_SRC scheme
     (use debug
          matchable
+         srfi-1
          srfi-13)
     
     (define (token-match? token)
       (lambda (dictum)
-        (member token (map string-downcase (string-tokenize token)))))
+        (member token (map string-downcase (string-tokenize dictum)) string=?)))
     
     (match "fuck this shit"
-      ((? (token-match? "fuck")) 'god-damn))
+      ((? (token-match? "nah")) 'god-damn)
+      (_ 'for-reals))
   #+END_SRC
 
 * TODO Use continuations to save place across requests
