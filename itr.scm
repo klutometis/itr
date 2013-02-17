@@ -26,7 +26,7 @@
 
 (define (token-match? token)
   (lambda (dictum)
-    (member token (map string-downcase (string-tokenize token)))))
+    (member token (map string-downcase (string-tokenize dictum)))))
 
 (define (airline-charge-card? user dictum)
   (let ((airline-user (airline-user-ref user)))
