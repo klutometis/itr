@@ -88,6 +88,6 @@
                       ;;  (lambda (user dictum) "Harro!"))
                       )))))
        (display-content-type-&c. 'json)
-       (write-json ((user-progress user) user dictum))))))
+       (display ((user-progress user) user dictum))))))
 
 ;; Airline-example:1 ends here
