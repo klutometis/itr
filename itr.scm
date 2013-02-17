@@ -81,10 +81,12 @@
                    (lambda ()
                      (make-user
                       user
-                      (hash-table-ref/default
-                       projects
-                       project
-                       (lambda (user dictum) "Harro!")))))))
+                      airline
+                      ;; (hash-table-ref/default
+                      ;;  projects
+                      ;;  project
+                      ;;  (lambda (user dictum) "Harro!"))
+                      )))))
        (display-content-type-&c. 'json)
        (write-json ((user-progress user) user dictum))))))
 
