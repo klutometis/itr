@@ -34,7 +34,7 @@
       ((? (token-match? "yes"))
        (user-progress-set! user airline)
        "Thanks; your flight is changed. Can I help you with anything else?")
-      ((? (takon-match? "no"))
+      ((? (token-match? "no"))
        (user-progress-set! user airline)
        "Your flight will stay the same; can I help you with anything else?")
       (_
