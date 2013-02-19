@@ -1,3 +1,10 @@
+* TODO JSON
+  #+BEGIN_SRC scheme
+    (use medea)
+    
+    (write-json '((message . "Harro") (route . "customer")))
+    
+  #+END_SRC
 * TODO Airline example
   Need a composite key: user and project; need a mapping from projects
   to roots to start the users.

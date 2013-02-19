@@ -74,20 +74,22 @@
    (let ((user (query-client-any query 'user))
          (project (query-client-any query 'project))
          (dictum (query-client-any query 'dictum)))
-     (let ((user (hash-table-update!
-                   users
-                   (cons user project)
-                   identity
-                   (lambda ()
-                     (make-user
-                      user
-                      airline
-                      ;; (hash-table-ref/default
-                      ;;  projects
-                      ;;  project
-                      ;;  (lambda (user dictum) "Harro!"))
-                      )))))
-       (display-content-type-&c. 'json)
-       (display ((user-progress user) user dictum))))))
+     (display-content-type-&c. 'json)
+     (when (and user project dictum)
+       (let ((user (hash-table-update!
+                    users
+                    (cons user project)
+                    identity
+                    (lambda ()
+                      (make-user
+                       user
+                       airline
+                       ;; (hash-table-ref/default
+                       ;;  projects
+                       ;;  project
+                       ;;  (lambda (user dictum) "Harro!"))
+                       )))))
+         (write-json `((response . ,((user-progress user) user dictum))
+                       (recipient . "customer"))))))))
 
 ;; Airline-example:1 ends here
