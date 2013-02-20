@@ -7,13 +7,31 @@
   #+END_SRC
 
   #+BEGIN_SRC scheme
-    (use http-client
-         medea)
+    (use alist-lib
+         debug
+         http-client
+         medea
+         srfi-13)
     
-    (with-input-from-request
-     "http://staging.crunchr.co/api/texthacker/user?phone=4152053084"
-     #f
-     read-json)
+    (pp
+     (with-input-from-request
+      "http://staging.crunchr.co/api/texthacker/user?phone=4152053084"
+      #f
+      read-json))
+    
+    (let ((metadata
+           (with-input-from-request
+            "http://staging.crunchr.co/api/texthacker/user?phone=4152053084"
+            #f
+            read-json)))
+      (debug
+       (car (string-tokenize (alist-ref (alist-ref metadata 'user) 'name))))
+      (let ((order
+             (alist-ref metadata 'order)))
+        (debug (alist-ref order 'price)
+               (alist-ref
+                (alist-ref order '_restaurant)
+                'name))))
   #+END_SRC
 * TODO Airline example
   Need a composite key: user and project; need a mapping from projects
