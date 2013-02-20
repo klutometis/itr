@@ -6,6 +6,7 @@
      call-with-query
      debug
      define-record-and-printer
+     http-client
      matchable
      medea)
 
@@ -69,6 +70,34 @@
 (define projects
   (alist->hash-table `(("1" . ,airline))))
 
+(define (crunch user dictum)
+  (let ((metadata
+         (with-input-from-request
+          (format
+           "http://staging.crunchr.co/api/texthacker/user?phone=~a"
+           (user-id user))
+          #f
+          read-json)))
+    (if (vector? metadata)
+        (values "It looks like you're a new customer; I'll forward you to an agent."
+                "agent")
+        (match dictum
+          ((? (token-match? "reorder"))
+           (let ((user (alist-ref metadata 'user))
+                 (order (alist-ref metadata 'order)))
+             (let ((restaurant (alist-ref order '_restaurant)))
+               (values (format "Hey ~a, good to see you again; I'll reorder from ~a and charge you $~a."
+                               (car (string-tokenize (alist-ref user 'name)))
+                               (alist-ref restaurant 'name)
+                               (alist-ref order 'price))
+                       "customer"))))
+          ((or (? (token-match? "where"))
+               (? (token-match? "status")))
+           (values "I'll forward you to an agent that can help you check the status of your order."
+                   "agent"))
+          (_ (values "Sorry, I didn't understand you. Text \"agent\" to get to a real person."
+                     "customer"))))))
+
 (call-with-dynamic-fastcgi-query
  (lambda (query)
    (let ((user (query-client-any query 'user))
@@ -83,13 +112,15 @@
                     (lambda ()
                       (make-user
                        user
-                       airline
+                       crunch
                        ;; (hash-table-ref/default
                        ;;  projects
                        ;;  project
                        ;;  (lambda (user dictum) "Harro!"))
                        )))))
-         (write-json `((response . ,((user-progress user) user dictum))
-                       (recipient . "customer"))))))))
+         (receive (response recipient)
+           ((user-progress user) user dictum)
+           (write-json `((response . ,response)
+                         (recipient . ,recipient)))))))))
 
 ;; Airline-example:1 ends here
